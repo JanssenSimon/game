@@ -1,7 +1,6 @@
 --character.lua
 --contains functions related to player character
 
-gamera = require("gamera")
 map = require("map")
 
 --module table
@@ -109,7 +108,7 @@ function character.update(dt)
     
     xComponent = 0
     if state == previousState then
-        --check if state change, if so, TODO set frame to 0 of new state
+        --check if state change, if so, set frame to 0 of new state
         previousState = state
         if state == "running" then
             xComponent = 768
@@ -120,7 +119,6 @@ function character.update(dt)
         end
     else
         --increment frame (make sure to have it loop back to initial frame)
-        --TODO figure out timing.
         if state == "running" then
             frame = frame + character.speed * 0.07 * dt
             frame = frame % 8

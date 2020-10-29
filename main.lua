@@ -1,3 +1,6 @@
+--main.lua
+--main function that runs the game
+
 map = require("map")
 gamera = require("gamera")
 character = require("character")

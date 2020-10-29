@@ -1,8 +1,6 @@
 --map.lua
 --contains functions essential to creating a procedural map
 
-gamera = require("gamera")
-
 --module table
 map = {}
 
