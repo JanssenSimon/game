@@ -4,11 +4,24 @@
 map = require("map")
 gamera = require("gamera")
 character = require("character")
---  socket = require "socket"
+socket = require "socket"
 
---  --server info
---  address, port = "localhost", 6969
---  updaterate = 0.1
+--open the config file
+configFile = io.open("conf.conf", "r")
+io.input(configFile)
+settings = {}
+for line in io.lines() do
+  table.insert(settings, line)
+end
+
+--extract server info from settings
+for i,setting in ipairs(settings) do 
+    if string.find(setting, 'serverIP:') then
+        address = string.sub(setting, select(2, string.find(setting, 'serverIP:')) + 2, -1)
+    end
+end
+port = 25565
+updaterate = 0.1
 
 function love.load()
     --  --udp socket
@@ -26,7 +39,6 @@ function love.load()
     --game camera
     cam = gamera.new(0,0,50000,50000)
     cam:setWindow(0,0,800,600)
-
 end
 
 function love.update(dt)
