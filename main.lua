@@ -4,6 +4,7 @@
 map = require("map")
 gamera = require("gamera")
 character = require("character")
+otherCharacters = {}
 socket = require "socket"
 
 --open the config file
@@ -22,28 +23,27 @@ for i,setting in ipairs(settings) do
 end
 port = 25565
 updaterate = 0.1
+t = 0
 
 function love.load()
-    --  --udp socket
-    --  udp = socket.udp()
-    --  udp:settimeout(0)
-    --  udp:setpeername(address, port)
-    --  math.randomseed(os.time())
-    --  entity = tostring(math.random(99999))
-    --  
-    --  udp:send(entity..","..character.posX..","..character.posY)
-    --  
-	--  -- t is just a variable we use to help us with the update rate in love.update.
-	--  t = 0 -- (re)set t to 0
-
+    --udp socket
+    udp = socket.udp()
+    udp:settimeout(0)
+    udp:setpeername(address, port)
+    
+    -- dg = string.format()
+    -- udp:send(dg)
+    
     --game camera
     cam = gamera.new(0,0,50000,50000)
     cam:setWindow(0,0,800,600)
+
+	-- t is to help us with the update rate of server in love.update.
+	t = 0 -- (re)set t to 0
 end
 
 function love.update(dt)
-    --  t = t+dt
-
+    --check inputs
     if love.keyboard.isDown("right") then
         character.move("right", dt)
     end
@@ -61,6 +61,24 @@ function love.update(dt)
 
     cam:setPosition(character.posX, character.posY)
     
+    --send info to server
+    t = t + dt
+    if t > updaterate then
+        -- dg = string.format()
+        -- upd:send(dg)
+
+        t = t - updaterate
+    end
+    --receive info from server
+    repeat
+        -- data, msg = udp:receive()
+
+        if data then
+            --parse data with data:match()
+        elseif msg ~= 'timeout' then
+            --error("Network error: "..tostring(msg))
+        end
+    until not data
 end
 
 function love.draw()
