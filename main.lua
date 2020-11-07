@@ -4,8 +4,13 @@
 map = require("map")
 gamera = require("gamera")
 character = require("character")
+math.randomseed(os.time())
+uniqueID = tostring(math.random(99999))
 otherCharacters = {}
 socket = require "socket"
+
+--TODO if local game, run the server locally
+--server = require("server")
 
 --open the config file
 configFile = io.open("conf.conf", "r")
@@ -21,18 +26,22 @@ for i,setting in ipairs(settings) do
         address = string.sub(setting, select(2, string.find(setting, 'serverIP:')) + 2, -1)
     end
 end
-port = 25565
+port = 6969
 updaterate = 0.1
 t = 0
 
 function love.load()
+
+    mainCharacter = character
+    mainCharacter.newCharacter(mainCharacter)
+    
     --udp socket
     udp = socket.udp()
     udp:settimeout(0)
     udp:setpeername(address, port)
     
-    -- dg = string.format()
-    -- udp:send(dg)
+    dg = string.format("%s %s %f %f %s %s", uniqueID, 'at', mainCharacter:getNetworkingData())
+    udp:send(dg)
     
     --game camera
     cam = gamera.new(0,0,50000,50000)
@@ -45,40 +54,63 @@ end
 function love.update(dt)
     --check inputs
     if love.keyboard.isDown("right") then
-        character.move("right", dt)
+        mainCharacter:move("right", dt)
     end
     if love.keyboard.isDown("left") then
-        character.move("left", dt)
+        mainCharacter:move("left", dt)
     end
     if love.keyboard.isDown("up") then
-        character.move("up", dt)
+        mainCharacter:move("up", dt)
     end
     if love.keyboard.isDown("down") then
-        character.move("down", dt)
+        mainCharacter:move("down", dt)
     end
 
-    character.update(dt)
+    mainCharacter:update(dt)
 
-    cam:setPosition(character.posX, character.posY)
+    cam:setPosition(mainCharacter:getPosition())
     
     --send info to server
     t = t + dt
     if t > updaterate then
-        -- dg = string.format()
-        -- upd:send(dg)
+        dg = string.format("%s %f %f %s %s", uniqueID, mainCharacter:getNetworkingData())
+        udp:send(dg)
 
         t = t - updaterate
     end
     --receive info from server
     repeat
-        -- data, msg = udp:receive()
+        data, msg = udp:receive()
 
         if data then
-            --parse data with data:match()
+            firstSeperatorIndex = string.find(data, " ")
+            secondSeperatorIndex = string.find(data, " ", 2)
+            thirdSeperatorIndex = string.find(data, " ", 3)
+            fourthSeperatorIndex = string.find(data, " ", 4)
+            
+            id = string.sub(data, 1, firstSeperatorIndex-1)
+            d2 = tonumber(string.sub(data, firstSeperatorIndex+1, secondSeperatorIndex-1))
+            d3 = tonumber(string.sub(data, secondSeperatorIndex+1, thirdSeperatorIndex-1))
+            d4 = string.sub(data, thirdSeperatorIndex+1, fourthSeperatorIndex-1)
+            d5 = string.sub(data, fourthSeperatorIndex+1, -1)
+
+            if not otherCharacters[id] then
+                otherCharacters[id] = {}
+                otherCharacters[id] = character.newCharacter(otherCharacters[id])
+            end
+            otherCharacters[id]:setData(d2, d3, d4, d5)
+
         elseif msg ~= 'timeout' then
-            --error("Network error: "..tostring(msg))
+            error("Network error: "..tostring(msg))
         end
     until not data
+
+    --update other characters
+    for id, c in pairs(otherCharacters) do
+        --if c.posX and c.posY and c.state and c.direction then
+        c:update(dt, true)
+        --end
+    end
 end
 
 function love.draw()
@@ -88,7 +120,12 @@ cam:draw(function(l,t,w,h)
     map.draw(cam, 10)
 
     --draw character
-    character.draw(cam)
+    character:draw(cam)
+
+    --draw other characters
+    --for id, c in pairs(otherCharacters) do
+        --c:draw(cam)
+    --end
 
 end)
 end

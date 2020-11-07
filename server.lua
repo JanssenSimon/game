@@ -1,10 +1,10 @@
 socket = require "socket"
 
-otherCharacters = {}
+characters = {}
 
 udp = socket.udp()
 udp:settimeout(0)
-udp:setsockname('*', 25565)
+udp:setsockname('*', 6969)
 
 running = true
 
@@ -13,13 +13,20 @@ while running do
     data, msg_or_ip, port_or_nil = udp:receivefrom()
 
     if data then
-        --parse data with data:match()
+        id = string.sub(data, 1, string.find(data, " ")-1)
+        characters[id] = data
+
+        for c, dat in pairs(characters) do
+            if c ~= id then
+                udp:sendto(dat, msg_or_ip, port_or_nil)
+            end
+        end
     elseif msg_or_ip ~= 'timeout' then
-		--error("Unknown network error: "..tostring(msg))
+		error("Unknown network error: "..tostring(msg))
 	end
  
 	socket.sleep(0.01)
 
-    running = false
-    print("Server shutdown.")
+    --running = false
+    --print("Server shutdown.")
 end
