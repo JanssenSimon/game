@@ -3,6 +3,8 @@
 
 map = require("map")
 gamera = require("gamera")
+class = require("tools.class")
+character = require("character")
 socket = require "socket"
 
 function love.load()
@@ -37,7 +39,23 @@ function love.load()
     uniqueID = tostring(math.random(99999))
 
     --init the local player's character
+    --TODO make an asset manager or something
+    localCharBody = love.graphics.newImage("assets/graphics/isometric_heroine/steel_armor.png")
+    localCharBodyQuads = {love.graphics.newQuad(512,0,128,128,localCharBody:getDimensions())}
+    localCharHead = love.graphics.newImage("assets/graphics/isometric_heroine/head_long.png")
+    localCharHeadQuads = {love.graphics.newQuad(512,0,128,128,localCharHead:getDimensions())}
+    localChar = class.makeFrom({character})
+    localChar:load(400, 200, {localCharBody, localCharHead}, {localCharBodyQuads, localCharHeadQuads})
     --TODO send the local player's info to server here
+
+
+    --second character to test that it works
+    localChar2Body = love.graphics.newImage("assets/graphics/isometric_heroine/steel_armor.png")
+    localChar2BodyQuads = {love.graphics.newQuad(512,0,128,128,localChar2Body:getDimensions())}
+    localChar2Head = love.graphics.newImage("assets/graphics/isometric_heroine/head_long.png")
+    localChar2HeadQuads = {love.graphics.newQuad(512,0,128,128,localChar2Head:getDimensions())}
+    localChar2 = class.makeFrom({character})
+    localChar2:load(300, 180, {localChar2Body, localChar2Head}, {localChar2BodyQuads, localChar2HeadQuads})
 
     --game camera
     cam = gamera.new(0,0,50000,50000)
@@ -53,6 +71,7 @@ function love.update(dt)
     --send info to server
     t = t + dt
     if t > updaterate then
+        --TODO
         --"uniqueID posX posY state direction"
         --dg = string.format("%s %f %f %s %s", uniqueID, mainCharacter:getNetworkingData())
         --udp:send(dg)
@@ -64,6 +83,7 @@ function love.update(dt)
         data, msg = udp:receive()
 
         if data then
+            --parse data from server
             firstSeperatorIndex = string.find(data, " ")
             secondSeperatorIndex = string.find(data, " ", 2)
             thirdSeperatorIndex = string.find(data, " ", 3)
@@ -75,6 +95,7 @@ function love.update(dt)
             st8 = string.sub(data, thirdSeperatorIndex+1, fourthSeperatorIndex-1)
             dir = string.sub(data, fourthSeperatorIndex+1, -1)
 
+            --TODO
             --if not otherCharacters[id] then
                 --otherCharacters[id] = {}
                 --setmetatable(otherCharacters[id], {__index=character})
@@ -87,12 +108,13 @@ function love.update(dt)
         end
     until not data
 
+    --TODO
     --update other characters
---    for id, c in pairs(otherCharacters) do
+    --for id, c in pairs(otherCharacters) do
         --if c.posX and c.posY and c.state and c.direction then
---        c:update(dt, true)
+            --c:update(dt, true)
         --end
---    end
+    --end
 end
 
 function love.draw()
@@ -101,10 +123,13 @@ cam:draw(function(l,t,w,h)
     --draw map
     map.draw(cam, 10)
 
-    --draw character
-    --character:draw(cam)
+    --draw local character
+    localChar:draw(cam)
 
-    --draw other characters
+    --draw second local character
+    localChar2:draw(cam)
+
+    --TODO draw other characters
     --for id, c in pairs(otherCharacters) do
         --c:draw(cam)
     --end
