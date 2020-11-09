@@ -38,6 +38,7 @@ function love.load()
     --generates (probably) unique ID for this client
     math.randomseed(os.time())
     uniqueID = tostring(math.random(99999))
+    print("My uniqueID is "..uniqueID)
 
     --init the local player's character
     --TODO make an asset manager or something
@@ -106,11 +107,12 @@ function love.update(dt)
         data, msg = udp:receive()
 
         if data then
+            --print("Message received!: "..data)
             --parse data from server
             firstSeperatorIndex = string.find(data, " ")
-            secondSeperatorIndex = string.find(data, " ", 2)
-            thirdSeperatorIndex = string.find(data, " ", 3)
-            fourthSeperatorIndex = string.find(data, " ", 4)
+            secondSeperatorIndex = string.find(data, " ", firstSeperatorIndex+1)
+            thirdSeperatorIndex = string.find(data, " ", secondSeperatorIndex+1)
+            fourthSeperatorIndex = string.find(data, " ", thirdSeperatorIndex+1)
             
             id = string.sub(data, 1, firstSeperatorIndex-1)
             x = tonumber(string.sub(data, firstSeperatorIndex+1, secondSeperatorIndex-1))
@@ -121,10 +123,10 @@ function love.update(dt)
             --TODO init other character if they dont exist
             if not otherCharacters[id] then
                 otherCharacters[id] = class.makeFrom({character})
-                otherCharacters[id]:load(300, 180, {otherCharsBody, otherCharsHead}, {otherCharsBodyQuads, otherCharsHeadQuads})
+                otherCharacters[id]:load(x, y, {otherCharsBody, otherCharsHead}, {otherCharsBodyQuads, otherCharsHeadQuads})
             end
             --change values of other character
-            otherCharacters[id]:setFromNetworking(d2, d3, d4, d5)
+            otherCharacters[id]:setFromNetworking(x, y, st8, dir)
 
         elseif msg ~= 'timeout' then
             --error("Network error: "..tostring(msg))
