@@ -20,10 +20,10 @@ function worldObject:getPosition()
 end
 
 function worldObject:setAnimation(num)
-    if num < 1 or num > table.getn(quads) then
+    if num < 1 then
         error("Argument of setAnimation() out of bounds or incompatible quads")
     end
-    self.currentAnimation = num
+    self.currentAnimation = num % table.getn(self.quads)
 end
 
 function worldObject:getAnimation()
@@ -54,9 +54,11 @@ end
 function worldObject:update(dt)
     --update quads based on animation timings
     self.t = self.t + dt
-    if self.t > 1/self.framerate then
-        self.t = self.t - 1/self.framerate
-        self.currentFrameNum = self.currentFrameNum + 1
+    if self.t > 1/self.animationFramerate then
+        self.t = self.t - 1/self.animationFramerate
+        --self.currentFrameNum = (self.currentFrameNum + 1) % table.getn(self.quads[self.currentAnimation]) 
+        print("New frame! Max: "..table.getn(self.quads[self.currentAnimation]))
+        self.currentFrameNum = 1
     end
 end
 

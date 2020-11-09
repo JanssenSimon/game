@@ -22,6 +22,7 @@ function love.load()
     for i,setting in ipairs(settings) do 
         if string.find(setting, 'serverIP:') then
             address = string.sub(setting, select(2, string.find(setting, 'serverIP:')) + 2, -1)
+            --TODO if address is localhost, start local server
         end
     end
     port = 6969
@@ -46,16 +47,17 @@ function love.load()
     localCharHeadQuads = {love.graphics.newQuad(512,0,128,128,localCharHead:getDimensions())}
     localChar = class.makeFrom({character})
     localChar:load(400, 200, {localCharBody, localCharHead}, {localCharBodyQuads, localCharHeadQuads})
-    --TODO send the local player's info to server here
+    --send the local player's info to server here
+    dg = string.format("%s %f %f %s %s", uniqueID, localChar:getNetworkingData())
+    udp:send(dg)
 
 
-    --second character to test that it works
-    localChar2Body = love.graphics.newImage("assets/graphics/isometric_heroine/steel_armor.png")
-    localChar2BodyQuads = {love.graphics.newQuad(512,0,128,128,localChar2Body:getDimensions())}
-    localChar2Head = love.graphics.newImage("assets/graphics/isometric_heroine/head_long.png")
-    localChar2HeadQuads = {love.graphics.newQuad(512,0,128,128,localChar2Head:getDimensions())}
-    localChar2 = class.makeFrom({character})
-    localChar2:load(300, 180, {localChar2Body, localChar2Head}, {localChar2BodyQuads, localChar2HeadQuads})
+    --TODO put this so that it varies depending on character
+    otherCharsBody = love.graphics.newImage("assets/graphics/isometric_heroine/steel_armor.png")
+    otherCharsBodyQuads = {love.graphics.newQuad(512,0,128,128,otherCharsBody:getDimensions())}
+    otherCharsHead = love.graphics.newImage("assets/graphics/isometric_heroine/head_long.png")
+    otherCharsHeadQuads = {love.graphics.newQuad(512,0,128,128,otherCharsHead:getDimensions())}
+    otherCharacters = {}
 
     --game camera
     cam = gamera.new(0,0,50000,50000)
@@ -66,15 +68,36 @@ end
 function love.update(dt)
 
     --TODO manage inputs here
+    mx = 0
+    my = 0
+    if love.keyboard.isDown("right") then
+        mx = 1
+    end
+    if love.keyboard.isDown("left") then
+        mx = -1
+    end
+    if love.keyboard.isDown("up") then
+        my = -1
+    end
+    if love.keyboard.isDown("down") then
+        my = 1
+    end
+    localChar:movementInput(mx, my)
+
     --TODO computer stuff for updating here
+    --update local character
+    localChar:update(dt)
+    --print(localChar:getNetworkingData())
+
+    --update the camera
+    cam:setPosition(localChar:getPosition())
 
     --send info to server
     t = t + dt
     if t > updaterate then
-        --TODO
-        --"uniqueID posX posY state direction"
-        --dg = string.format("%s %f %f %s %s", uniqueID, mainCharacter:getNetworkingData())
-        --udp:send(dg)
+        --send "uniqueID posX posY state direction"
+        dg = string.format("%s %f %f %s %s", uniqueID, localChar:getNetworkingData())
+        udp:send(dg)
 
         t = t - updaterate
     end
@@ -95,12 +118,13 @@ function love.update(dt)
             st8 = string.sub(data, thirdSeperatorIndex+1, fourthSeperatorIndex-1)
             dir = string.sub(data, fourthSeperatorIndex+1, -1)
 
-            --TODO
-            --if not otherCharacters[id] then
-                --otherCharacters[id] = {}
-                --setmetatable(otherCharacters[id], {__index=character})
-            --end
-            --otherCharacters[id]:setData(d2, d3, d4, d5)
+            --TODO init other character if they dont exist
+            if not otherCharacters[id] then
+                otherCharacters[id] = class.makeFrom({character})
+                otherCharacters[id]:load(300, 180, {otherCharsBody, otherCharsHead}, {otherCharsBodyQuads, otherCharsHeadQuads})
+            end
+            --change values of other character
+            otherCharacters[id]:setFromNetworking(d2, d3, d4, d5)
 
         elseif msg ~= 'timeout' then
             --error("Network error: "..tostring(msg))
@@ -110,11 +134,9 @@ function love.update(dt)
 
     --TODO
     --update other characters
-    --for id, c in pairs(otherCharacters) do
-        --if c.posX and c.posY and c.state and c.direction then
-            --c:update(dt, true)
-        --end
-    --end
+    for id, c in pairs(otherCharacters) do
+        c:update(dt)
+    end
 end
 
 function love.draw()
@@ -126,13 +148,10 @@ cam:draw(function(l,t,w,h)
     --draw local character
     localChar:draw(cam)
 
-    --draw second local character
-    localChar2:draw(cam)
-
     --TODO draw other characters
-    --for id, c in pairs(otherCharacters) do
-        --c:draw(cam)
-    --end
+    for id, c in pairs(otherCharacters) do
+        c:draw(cam)
+    end
 
 end)
 end
