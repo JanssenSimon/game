@@ -5,17 +5,19 @@ map = require("map")
 gamera = require("gamera")
 class = require("tools.class")
 character = require("character")
+assetManager = require("assetManager")
 socket = require "socket"
 
 function love.load()
 
     --load the config file
-    configFile = io.open("conf.conf", "r")
+    configFile = io.open("conf.conf", "a")
     io.input(configFile)
     settings = {}
     for line in io.lines() do
     table.insert(settings, line)
     end
+    io.close(configFile)
 
     --server specification stuff
     --extract server info from settings
@@ -23,6 +25,7 @@ function love.load()
         if string.find(setting, 'serverIP:') then
             address = string.sub(setting, select(2, string.find(setting, 'serverIP:')) + 2, -1)
             --TODO if address is localhost, start local server
+            --TODO if you can't find file, make it and connect to localhost
         end
     end
     port = 6969
@@ -41,23 +44,20 @@ function love.load()
     print("My uniqueID is "..uniqueID)
 
     --init the local player's character
-    --TODO make an asset manager or something
-    localCharBody = love.graphics.newImage("assets/graphics/isometric_heroine/steel_armor.png")
-    localCharBodyQuads = {love.graphics.newQuad(512,0,128,128,localCharBody:getDimensions())}
-    localCharHead = love.graphics.newImage("assets/graphics/isometric_heroine/head_long.png")
-    localCharHeadQuads = {love.graphics.newQuad(512,0,128,128,localCharHead:getDimensions())}
+    localCharBody = assetManager.human.image.getBody("female", "steel")
+    localCharHead = assetManager.human.image.getHead("female")
+    localCharAnims = {assetManager.human.quads.getIdle(), assetManager.human.quads.getRunning()}
     localChar = class.makeFrom({character})
-    localChar:load(400, 200, {localCharBody, localCharHead}, {localCharBodyQuads, localCharHeadQuads})
+    localChar:load(400, 200, {localCharBody, localCharHead}, localCharAnims)
     --send the local player's info to server here
     dg = string.format("%s %f %f %s %s", uniqueID, localChar:getNetworkingData())
     udp:send(dg)
 
 
-    --TODO put this so that it varies depending on character
-    otherCharsBody = love.graphics.newImage("assets/graphics/isometric_heroine/steel_armor.png")
-    otherCharsBodyQuads = {love.graphics.newQuad(512,0,128,128,otherCharsBody:getDimensions())}
-    otherCharsHead = love.graphics.newImage("assets/graphics/isometric_heroine/head_long.png")
-    otherCharsHeadQuads = {love.graphics.newQuad(512,0,128,128,otherCharsHead:getDimensions())}
+    --TODO put this so that armor and shit varies depending on character
+    otherCharsBody = assetManager.human.image.getBody("female", "steel")
+    otherCharsHead = assetManager.human.image.getHead("female")
+    otherCharsAnims = {assetManager.human.quads.getIdle(), assetManager.human.quads.getRunning()}
     otherCharacters = {}
 
     --game camera
@@ -123,7 +123,7 @@ function love.update(dt)
             --TODO init other character if they dont exist
             if not otherCharacters[id] then
                 otherCharacters[id] = class.makeFrom({character})
-                otherCharacters[id]:load(x, y, {otherCharsBody, otherCharsHead}, {otherCharsBodyQuads, otherCharsHeadQuads})
+                otherCharacters[id]:load(x, y, {otherCharsBody, otherCharsHead}, otherCharsAnims)
             end
             --change values of other character
             otherCharacters[id]:setFromNetworking(x, y, st8, dir)

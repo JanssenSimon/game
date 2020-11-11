@@ -6,6 +6,7 @@ worldObject = require("primitives.worldObject")
 moveable = require("primitives.moveable")
 
 map = require("map")
+assetManager = require("assetManager")
 
 --module table
 character = class.makeFrom({worldObject, moveable})
@@ -13,14 +14,32 @@ character = class.makeFrom({worldObject, moveable})
 character.state = "idle"
 character.direction = "right"
 character.speed = 300
---TODO make change of state from running to idle depend on animation
-character.ft = 0
+--TODO make framerate depend on speed
 character.drawOffsetX = -64
 character.drawOffsetY = -96
+--if input received in this cycle
+character.flagInput = false
+
+function character:setState(stt)
+    if self.state ~= stt then
+        self.state = stt
+        if stt == "idle" then
+            self:setAnimation(1)
+            self.currentFrameNum = 1
+        elseif stt == "running" then
+            self:setAnimation(2)
+            self.currentFrameNum = 1
+        end
+    end
+end
 
 --TODO put this in its own primitive, controllable
 function character:movementInput(x, y)
-    self.state = "running"
+    if x == 0 and y == 0 then
+        return nil
+    end
+    self.flagInput = true
+    self:setState("running")
     if y > 0 then
         if x > 0 then
             self.direction = "downright"
@@ -73,9 +92,11 @@ function character:update(dt)
     self.t = self.t + dt
     if self.t > 1/self.animationFramerate then
         self.t = self.t - 1/self.animationFramerate
-        self.currentFrameNum = (self.currentFrameNum + 1) % table.getn(self.quads[self.currentAnimation]) 
-        self.currentFrameNum = 1
+        self.currentFrameNum = ((self.currentFrameNum) % table.getn(self.animations[self.currentAnimation])) + 1
+        --print(self.currentFrameNum.."/"..table.getn(self.animations[self.currentAnimation]))
     end
+
+    self.animations = {assetManager.human.quads.getIdle(self.direction), assetManager.human.quads.getRunning(self.direction)}
 
     if self.state == "running" then
         if self.direction == "right" then
@@ -104,10 +125,8 @@ function character:update(dt)
             self.velY = self.speed * math.sqrt(0.5)
         end
 
-        self.ft = self.ft - dt
-        if self.ft < 0 then
-            self.ft = 0
-            self.state = "idle"
+        if not self.flagInput and (self.currentFrameNum == 4 or self.currentFrameNum == 8) then
+            self:setState("idle")
         end
     end
 
@@ -122,7 +141,8 @@ function character:update(dt)
     self.posX = self.posX + self.velX * dt
     self.posY = self.posY + self.velY * dt
 
-    --make sure 
+    --make sure player doesn't leave map at top or left
+    --TODO bottom and right
     if self.posX < 65 then
         self.posX = 65
         self.velX = 0
@@ -130,6 +150,10 @@ function character:update(dt)
     if self.posY < 97 then
         self.posY = 97
         self.velY = 0
+    end
+
+    if self.flagInput then
+        self.flagInput = false
     end
 end
 

@@ -1,21 +1,14 @@
 --map.lua
 --contains functions essential to creating a procedural map
 
+assetManager = require("assetManager")
+
 --module table
 map = {}
 
 
 --tiles for ground
-grass_and_water = love.graphics.newImage("assets/graphics/grass_and_water.png")
-function getGrassTile(i)
-    i=math.floor(i%3)
-    return love.graphics.newQuad(0+i*64, 0, 64, 64, grass_and_water:getDimensions())
-end
-function getWaterTile(i)
-    i=math.floor(i%1)
-    return love.graphics.newQuad(128+i*64, 320, 64, 64, grass_and_water:getDimensions())
-end
-
+grass_and_water = assetManager.ground.image.getTiles()
 
 -- returns elevation at coordinates based on noise function
 function map.elevation(x, y)
@@ -51,10 +44,10 @@ function map.draw(cam, r)
     for i=-r,r do
         for j=-r,r do
             if map.getTile(x+i,y+j) == "grass" then
-                quad = getGrassTile(love.math.noise(x+i,y+j)*4)
+                quad = assetManager.ground.quads.getGrass(love.math.noise(x+i,y+j)*4)
                 love.graphics.draw(grass_and_water, quad, map.getCoords(x+i, y+j))
             elseif map.getTile(x+i,y+j) == "water" then
-                quad = getWaterTile(love.math.noise(x+i,y+j)*2)
+                quad = assetManager.ground.quads.getWater(love.math.noise(x+i,y+j)*2)
                 love.graphics.draw(grass_and_water, quad, map.getCoords(x+i, y+j))
             end
         end
