@@ -11,7 +11,7 @@ socket = require "socket"
 function love.load()
 
     --load the config file
-    configFile = io.open("conf.conf", "a")
+    configFile = io.open("conf.conf", "r")
     io.input(configFile)
     settings = {}
     for line in io.lines() do
