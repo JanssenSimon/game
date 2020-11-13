@@ -11,7 +11,13 @@ socket = require "socket"
 function love.load()
 
     --load the config file
-    configFile = io.open("conf.conf", "r")
+    home = ""
+    isUsingMacos = false
+    --TODO if macos, search home directory. add instructions to app to copy conf.conf to home directory
+    if isUsingMacos then
+        home = os.getenv("HOME")
+    end
+    configFile = io.open(home.."conf.conf", "r")
     io.input(configFile)
     settings = {}
     for line in io.lines() do
@@ -25,7 +31,6 @@ function love.load()
         if string.find(setting, 'serverIP:') then
             address = string.sub(setting, select(2, string.find(setting, 'serverIP:')) + 2, -1)
             --TODO if address is localhost, start local server
-            --TODO if you can't find file, make it and connect to localhost
         end
     end
     port = 6969

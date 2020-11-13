@@ -82,8 +82,8 @@ end
 function character:setFromNetworking(x, y, stt, dir)
     self.posX = x
     self.posY = y
-    self.state = stt
     self.direction = dir
+    seld:setState(stt)
 end
 
 --TODO make it so you don't have to correct this here correct todos in class
@@ -135,9 +135,22 @@ function character:update(dt)
         self.velY = 0
     end
 
-    --update velocity and position
+    --update velocity
     self.velX = self.velX + self.aclX * dt
     self.velY = self.velY + self.aclY * dt
+
+    --TODO check for collisions and change velocity if there are some
+    --TODO es-ce possible de checker s'il y a des collisions sur le segment de 
+    --  droite qui contient tous les points entre la position initiale et la 
+    --  position apres le deplacement. si oui, deplacer le joueur a la limite.
+    --  ensuite evaluer la tangente de la collision pour voir si la vitesse 
+    --  change de direction.
+    if map.getTile(map.getTileCoords(self.posX+self.velX*dt, self.posY+self.velY*dt)) == "water" then
+        self.velX = 0
+        self.velY = 0
+    end
+
+    --update position
     self.posX = self.posX + self.velX * dt
     self.posY = self.posY + self.velY * dt
 
