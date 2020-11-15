@@ -12,7 +12,7 @@ grass_and_water = assetManager.ground.image.getTiles()
 
 -- returns elevation at coordinates based on noise function
 function map.elevation(x, y)
-    return love.math.noise(0.025*x,0.025*y)+0.5*love.math.noise(0.05*x,0.05*y)+0.25*love.math.noise(0.1*x, 0.1*y)
+    return love.math.noise(0.00625*x,0.00625*y)+0.5*love.math.noise(0.0125*x,0.0125*y)+0.25*love.math.noise(0.025*x, 0.025*y)+0.125*love.math.noise(0.05*x, 0.05*y)+0.0625*love.math.noise(0.1*x,0.1*y)
 end
 
 
