@@ -101,10 +101,12 @@ end
 function assetManager.ground.image.getTiles()
     return love.graphics.newImage("assets/graphics/grass_and_water.png")
 end
+--TODO add argument for variants depending on other tiles
 function assetManager.ground.quads.getGrass(i)
     i=math.floor(i%3)
     return love.graphics.newQuad(0+i*64, 0, 64, 64, grass_and_water:getDimensions())
 end
+--TODO add argument for variants depending on other tiles
 function assetManager.ground.quads.getWater(i)
     i=math.floor(i%1)
     return love.graphics.newQuad(128+i*64, 320, 64, 64, grass_and_water:getDimensions())

@@ -44,9 +44,12 @@ function map.draw(cam, r)
     for i=-r,r do
         for j=-r,r do
             if map.getTile(x+i,y+j) == "grass" then
+                --TODO check surrounding tiles and call getGrass with a variant argument
                 quad = assetManager.ground.quads.getGrass(love.math.noise(x+i,y+j)*4)
                 love.graphics.draw(grass_and_water, quad, map.getCoords(x+i, y+j))
             elseif map.getTile(x+i,y+j) == "water" then
+                --TODO check surrounding tiles and call getGrass with a variant argument
+                --most variants are for water
                 quad = assetManager.ground.quads.getWater(love.math.noise(x+i,y+j)*2)
                 love.graphics.draw(grass_and_water, quad, map.getCoords(x+i, y+j))
             end
