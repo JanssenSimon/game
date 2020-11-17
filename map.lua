@@ -43,14 +43,47 @@ function map.draw(cam, r)
     x,y=map.getTileCoords(cam:getPosition())
     for i=-r,r do
         for j=-r,r do
+            --Check surrounding tiles
+            --+x is down and right, +y is down and left
+            surroundingTiles = ""
+            for surroundingTile=1,9 do
+                deltaX = ((surroundingTile-1)%3)-1
+                deltaY = math.floor((surroundingTile-1)/3)-1
+                if map.getTile(x+i+deltaX,y+j+deltaY) == "grass" then
+                    surroundingTiles = surroundingTiles.."g"
+                elseif map.getTile(x+i+deltaX,y+j+deltaY) == "water" then
+                    surroundingTiles = surroundingTiles.."w"
+                end
+            end
+            --TODO instead of calling getTile function again, check center char of surroundingTiles
             if map.getTile(x+i,y+j) == "grass" then
-                --TODO check surrounding tiles and call getGrass with a variant argument
-                quad = assetManager.ground.quads.getGrass(love.math.noise(x+i,y+j)*4)
+                if surroundingTiles == "gggggwgww" then
+                    quad = assetManager.ground.quads.getGrass(0, 1)
+                elseif surroundingTiles == "gggwggwwg" then
+                    quad = assetManager.ground.quads.getGrass(0, 2)
+                elseif surroundingTiles == "wwgwggggg" then
+                    quad = assetManager.ground.quads.getGrass(0, 3)
+                elseif surroundingTiles == "gwwggwggg" then
+                    quad = assetManager.ground.quads.getGrass(0, 4)
+                else
+                    --regular tile
+                    quad = assetManager.ground.quads.getGrass(love.math.noise(x+i,y+j)*4)
+                end
                 love.graphics.draw(grass_and_water, quad, map.getCoords(x+i, y+j))
+            --TODO instead of calling getTile function again, check center char of surroundingTiles
             elseif map.getTile(x+i,y+j) == "water" then
-                --TODO check surrounding tiles and call getGrass with a variant argument
-                --most variants are for water
-                quad = assetManager.ground.quads.getWater(love.math.noise(x+i,y+j)*2)
+                if surroundingTiles == "w" then
+                    quad = assetManager.ground.quads.getGrass(0, 1)
+                elseif surroundingTiles == "w" then
+                    quad = assetManager.ground.quads.getGrass(0, 2)
+                elseif surroundingTiles == "w" then
+                    quad = assetManager.ground.quads.getGrass(0, 3)
+                elseif surroundingTiles == "w" then
+                    quad = assetManager.ground.quads.getGrass(0, 4)
+                else
+                    --regular tile
+                    quad = assetManager.ground.quads.getWater(love.math.noise(x+i,y+j)*2)
+                end
                 love.graphics.draw(grass_and_water, quad, map.getCoords(x+i, y+j))
             end
         end
