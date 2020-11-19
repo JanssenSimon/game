@@ -101,16 +101,21 @@ end
 function assetManager.ground.image.getTiles()
     return love.graphics.newImage("assets/graphics/grass_and_water.png")
 end
---TODO add argument for variants depending on other tiles
 function assetManager.ground.quads.getGrass(i,j)
     if j then
+        --if j argument given, use the jth quad on the second row
         return love.graphics.newQuad(0+(j-1)*64, 64, 64, 64, grass_and_water:getDimensions())
     end
+    --if j argument not given, use a random quad from the first row
     i=math.floor(i%3)
     return love.graphics.newQuad(0+i*64, 0, 64, 64, grass_and_water:getDimensions())
 end
---TODO add argument for variants depending on other tiles
-function assetManager.ground.quads.getWater(i)
+function assetManager.ground.quads.getWater(i,j)
+    --if j argument is given, use the quad at i(row) j(column) starting at 3rd row (inclusive)
+    if j then
+        return love.graphics.newQuad(0+(i-1)*64, 128+(j-1)*64, 64, 64, grass_and_water:getDimensions())
+    end
+    --otherwise pick one of the two last water quads
     i=math.floor(i%1)
     return love.graphics.newQuad(128+i*64, 320, 64, 64, grass_and_water:getDimensions())
 end
