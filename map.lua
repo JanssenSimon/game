@@ -57,41 +57,39 @@ function map.draw(cam, r)
             end
             --TODO instead of calling getTile function again, check center char of surroundingTiles
             if map.getTile(x+i,y+j) == "grass" then
-                if string.find(surroundingTiles, "gggggwgww") then
-                    quad = assetManager.ground.quads.getGrass(1, 1)
-                elseif surroundingTiles == "gggwggwwg" then
-                    quad = assetManager.ground.quads.getGrass(1, 2)
-                elseif surroundingTiles == "wwgwggggg" then
-                    quad = assetManager.ground.quads.getGrass(1, 3)
-                elseif surroundingTiles == "gwwggwggg" then
-                    quad = assetManager.ground.quads.getGrass(1, 4)
-                else
-                    --regular tile
-                    quad = assetManager.ground.quads.getGrass(love.math.noise(x+i,y+j)*4)
-                end
+                --regular tile
+                quad = assetManager.ground.quads.getGrass(love.math.noise(x+i,y+j)*4)
                 love.graphics.draw(grass_and_water, quad, map.getCoords(x+i, y+j))
             --TODO instead of calling getTile function again, check center char of surroundingTiles
             elseif map.getTile(x+i,y+j) == "water" then
-                if surroundingTiles == "gwwwwwwww" then
-               --    quad = assetManager.ground.quads.getGrass(1, 1)
-               --elseif surroundingTiles == "wwgwwwwww" then
-               --    quad = assetManager.ground.quads.getGrass(1, 2)
-               --elseif surroundingTiles == "wwwwwwwwg" then
-               --    quad = assetManager.ground.quads.getGrass(1, 3)
-               --elseif surroundingTiles == "wwwwwwgww" then
-               --    quad = assetManager.ground.quads.getGrass(1, 4)
-               --elseif surroundingTiles == "*g*wwwwww" then
-               --    quad = assetManager.ground.quads.getGrass(love.math.noise(x+i,y+j)*2+1, 1)
-               --elseif surroundingTiles == "wwwwwwwwg" then
-               --    quad = assetManager.ground.quads.getGrass(love.math.noise(x+i,y+j)*2+1, 2)
-               --elseif surroundingTiles == "wwwwwwgww" then
-               --    quad = assetManager.ground.quads.getGrass(love.math.noise(x+i,y+j)*2+1, 3)
-               --elseif surroundingTiles == "wwgwwwwww" then
-               --    quad = assetManager.ground.quads.getGrass(love.math.noise(x+i,y+j)*2+1, 4)
-               --elseif surroundingTiles == "wwwwwwgww" then
-               --    quad = assetManager.ground.quads.getGrass(4, 1)
-               --elseif surroundingTiles == "wwwwwwgww" then
-               --    quad = assetManager.ground.quads.getGrass(4, 2)
+                if string.find(surroundingTiles, "%ag%agw%a%a%a%a") then
+                    quad = assetManager.ground.quads.getWater(1, 1)
+                elseif string.find(surroundingTiles, "%ag%awwg%a%a%a") then
+                    quad = assetManager.ground.quads.getWater(2, 1)
+                elseif string.find(surroundingTiles, "ww%awwg%ag%a") then
+                    quad = assetManager.ground.quads.getWater(3, 1)
+                elseif string.find(surroundingTiles, "%aw%agww%ag%a") then
+                    quad = assetManager.ground.quads.getWater(4, 1)
+                elseif string.find(surroundingTiles, "gw%aww%a%a%ag") then
+                    quad = assetManager.ground.quads.getWater(1, 5)
+                elseif string.find(surroundingTiles, "%awgww%ag%a%a") then
+                    quad = assetManager.ground.quads.getWater(2, 5)
+                elseif string.find(surroundingTiles, "gw%aww%a%a%a%a") then
+                    quad = assetManager.ground.quads.getWater(1, 2)
+                elseif string.find(surroundingTiles, "%awgwww%a%a%a") then
+                    quad = assetManager.ground.quads.getWater(2, 2)
+                elseif string.find(surroundingTiles, "%aw%awww%awg") then
+                    quad = assetManager.ground.quads.getWater(3, 2)
+                elseif string.find(surroundingTiles, "%aw%awwwgw%a") then
+                    quad = assetManager.ground.quads.getWater(4, 2)
+                elseif string.find(surroundingTiles, "%ag%awww%a%a%a") then
+                    quad = assetManager.ground.quads.getWater(1, 3+math.floor(love.math.noise(x+i,y+j)*2)%2)
+                elseif string.find(surroundingTiles, "%aw%awwg%aw%a") then
+                    quad = assetManager.ground.quads.getWater(2, 3+math.floor(love.math.noise(x+i,y+j)*2)%2)
+                elseif string.find(surroundingTiles, "%aw%awww%ag%a") then
+                    quad = assetManager.ground.quads.getWater(3, 3+math.floor(love.math.noise(x+i,y+j)*2)%2)
+                elseif string.find(surroundingTiles, "%aw%agww%aw%a") then
+                    quad = assetManager.ground.quads.getWater(4, 3+math.floor(love.math.noise(x+i,y+j)*2)%2)
                 else
                     --regular tile
                     quad = assetManager.ground.quads.getWater(love.math.noise(x+i,y+j)*2)
