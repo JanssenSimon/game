@@ -32,7 +32,7 @@ while running do
         end
     end
  
-	socket.sleep(0.01)
+	socket.sleep(0.001)
 
     --running = false
     --print("Server shutdown.")
