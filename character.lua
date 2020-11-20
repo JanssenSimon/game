@@ -83,7 +83,7 @@ function character:setFromNetworking(x, y, stt, dir)
     self.posX = x
     self.posY = y
     self.direction = dir
-    seld:setState(stt)
+    self:setState(stt)
 end
 
 --TODO make it so you don't have to correct this here correct todos in class

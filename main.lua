@@ -13,7 +13,19 @@ function love.load()
     --load the config file
     home = ""
     isUsingMacos = false
-    --TODO if macos, search home directory. add instructions to app to copy conf.conf to home directory
+
+    --Detect if macos is being used
+    local BinaryFormat = package.cpath:match("%p[\\|/]?%p(%a+)")
+    if BinaryFormat == "dll" then
+        --using windows
+    elseif BinaryFormat == "so" then
+        --using linux
+    elseif BinaryFormat == "dylib" then
+        isUsingMacos = true
+    end
+    BinaryFormat = nil
+
+    --if macos, search for config in home directory make sure instructions ship with game
     if isUsingMacos then
         home = os.getenv("HOME")
     end
@@ -73,7 +85,7 @@ end
 
 function love.update(dt)
 
-    --TODO manage inputs here
+    --manage inputs
     mx = 0
     my = 0
     if love.keyboard.isDown("right") then
@@ -90,7 +102,7 @@ function love.update(dt)
     end
     localChar:movementInput(mx, my)
 
-    --TODO computer stuff for updating here
+    --computer stuff for updating
     --update local character
     localChar:update(dt)
     --print(localChar:getNetworkingData())
@@ -125,7 +137,7 @@ function love.update(dt)
             st8 = string.sub(data, thirdSeperatorIndex+1, fourthSeperatorIndex-1)
             dir = string.sub(data, fourthSeperatorIndex+1, -1)
 
-            --TODO init other character if they dont exist
+            --init other character if they dont exist
             if not otherCharacters[id] then
                 otherCharacters[id] = class.makeFrom({character})
                 otherCharacters[id]:load(x, y, {otherCharsBody, otherCharsHead}, otherCharsAnims)
@@ -139,7 +151,6 @@ function love.update(dt)
         end
     until not data
 
-    --TODO
     --update other characters
     for id, c in pairs(otherCharacters) do
         c:update(dt)
@@ -155,7 +166,7 @@ cam:draw(function(l,t,w,h)
     --draw local character
     localChar:draw(cam)
 
-    --TODO draw other characters
+    --draw other characters
     for id, c in pairs(otherCharacters) do
         c:draw(cam)
     end
