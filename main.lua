@@ -66,6 +66,8 @@ function love.load()
     localCharAnims = {assetManager.human.quads.getIdle(), assetManager.human.quads.getRunning()}
     localChar = class.makeFrom({character})
     localChar:load(400, 200, {localCharBody, localCharHead}, localCharAnims)
+    localChar:setSpeed(30)
+    localChar:setArmor("leather")
     --send the local player's info to server here
     dg = string.format("%s %f %f %s %s", uniqueID, localChar:getNetworkingData())
     udp:send(dg)
@@ -141,6 +143,8 @@ function love.update(dt)
             if not otherCharacters[id] then
                 otherCharacters[id] = class.makeFrom({character})
                 otherCharacters[id]:load(x, y, {otherCharsBody, otherCharsHead}, otherCharsAnims)
+                otherCharacters[id]:setSpeed(30)
+                otherCharacters[id]:setArmor("steel")
             end
             --change values of other character
             otherCharacters[id]:setFromNetworking(x, y, st8, dir)

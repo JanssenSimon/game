@@ -19,6 +19,16 @@ character.drawOffsetX = -64
 character.drawOffsetY = -96
 --if input received in this cycle
 character.flagInput = false
+character.armor = "steel"
+
+function character:getSpeed()
+    return self.speed
+end
+
+function character:setSpeed(spd)
+    self.speed = spd
+    self.animationFamerate = self.speed/2
+end
 
 function character:setState(stt)
     if self.state ~= stt then
@@ -31,6 +41,15 @@ function character:setState(stt)
             self.currentFrameNum = 1
         end
     end
+end
+
+function character:getArmor()
+    return self.armor
+end
+
+function character:setArmor(armr)
+    self.armor = armr
+    self.sprites[1] = assetManager.human.image.getBody("female", self.armor)
 end
 
 --TODO put this in its own primitive, controllable
@@ -88,7 +107,6 @@ end
 
 --TODO make it so you don't have to correct this here correct todos in class
 function character:update(dt)
-    self.animationFamerate = self.speed/2
 
     --update quads based on animation timings
     self.t = self.t + dt
