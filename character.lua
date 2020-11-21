@@ -13,7 +13,7 @@ character = class.makeFrom({worldObject, moveable})
 
 character.state = "idle"
 character.direction = "right"
-character.speed = 300
+character.speed = 30
 --TODO make framerate depend on speed
 character.drawOffsetX = -64
 character.drawOffsetY = -96
@@ -88,6 +88,8 @@ end
 
 --TODO make it so you don't have to correct this here correct todos in class
 function character:update(dt)
+    self.animationFamerate = self.speed/2
+
     --update quads based on animation timings
     self.t = self.t + dt
     if self.t > 1/self.animationFramerate then
@@ -100,29 +102,29 @@ function character:update(dt)
 
     if self.state == "running" then
         if self.direction == "right" then
-            self.velX = self.speed
+            self.velX = self.speed * 10
             self.velY = 0
         elseif self.direction == "upright" then
-            self.velX = self.speed * math.sqrt(0.5)
-            self.velY = -self.speed * math.sqrt(0.5)
+            self.velX = self.speed * 10 * math.sqrt(0.5)
+            self.velY = -self.speed * 10 * math.sqrt(0.5)
         elseif self.direction == "up" then
             self.velX = 0
-            self.velY = -self.speed
+            self.velY = -self.speed * 10
         elseif self.direction == "upleft" then
-            self.velX = -self.speed * math.sqrt(0.5)
-            self.velY = -self.speed * math.sqrt(0.5)
+            self.velX = -self.speed * 10 * math.sqrt(0.5)
+            self.velY = -self.speed * 10 * math.sqrt(0.5)
         elseif self.direction == "left" then
-            self.velX = -self.speed
+            self.velX = -self.speed * 10
             self.velY = 0
         elseif self.direction == "downleft" then
-            self.velX = -self.speed * math.sqrt(0.5)
-            self.velY = self.speed * math.sqrt(0.5)
+            self.velX = -self.speed * 10 * math.sqrt(0.5)
+            self.velY = self.speed * 10 * math.sqrt(0.5)
         elseif self.direction == "down" then
             self.velX = 0
-            self.velY = self.speed
+            self.velY = self.speed * 10
         elseif self.direction == "downright" then
-            self.velX = self.speed * math.sqrt(0.5)
-            self.velY = self.speed * math.sqrt(0.5)
+            self.velX = self.speed * 10 * math.sqrt(0.5)
+            self.velY = self.speed * 10 * math.sqrt(0.5)
         end
 
         if not self.flagInput and (self.currentFrameNum == 4 or self.currentFrameNum == 8) then
