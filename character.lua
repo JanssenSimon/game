@@ -17,9 +17,9 @@ character.speed = 30
 --TODO make framerate depend on speed
 character.drawOffsetX = -64
 character.drawOffsetY = -96
---if input received in this cycle
-character.flagInput = false
+character.flagInput = false --if input received in this cycle
 character.armor = "steel"
+character.gender = "female"
 
 function character:getSpeed()
     return self.speed
@@ -50,7 +50,19 @@ end
 function character:setArmor(armr)
     if self.armor ~= armr then
         self.armor = armr
-        self.sprites[1] = assetManager.human.image.getBody("female", self.armor)
+        self.sprites[1] = assetManager.human.image.getBody(self.gender, self.armor)
+    end
+end
+
+function character:getGender()
+    return self.gender
+end
+
+function character:setGender(gend)
+    if self.gender ~= gend then
+        self.gender = gend
+        self.sprites[2] = assetManager.human.image.getHead(self.gender)
+        self.sprites[1] = assetManager.human.image.getBody(self.gender, self.armor)
     end
 end
 

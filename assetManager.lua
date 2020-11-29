@@ -16,7 +16,7 @@ function assetManager.human.image.getHead(sex, variant)
             return love.graphics.newImage("assets/graphics/isometric_hero/male_head1.png")
         elseif variant == 2 then 
             return love.graphics.newImage("assets/graphics/isometric_hero/male_head2.png")
-        elseif variant == 3 then 
+        else 
             return love.graphics.newImage("assets/graphics/isometric_hero/male_head3.png")
         end
     elseif sex == "female" then 

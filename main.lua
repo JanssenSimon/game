@@ -128,6 +128,7 @@ function love.update(dt)
         if data then
             --print("Message received!: "..data)
             --parse data from server
+            --TODO make a loop for this
             firstSeperatorIndex = string.find(data, " ")
             secondSeperatorIndex = string.find(data, " ", firstSeperatorIndex+1)
             thirdSeperatorIndex = string.find(data, " ", secondSeperatorIndex+1)
@@ -168,6 +169,7 @@ cam:draw(function(l,t,w,h)
     --draw map
     map.draw(cam, 10)
 
+    --TODO fix z fighting
     --draw local character
     localChar:draw(cam)
 
