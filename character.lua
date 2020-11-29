@@ -13,13 +13,13 @@ character = class.makeFrom({worldObject, moveable})
 
 character.state = "idle"
 character.direction = "right"
-character.speed = 30
---TODO make framerate depend on speed
 character.drawOffsetX = -64
 character.drawOffsetY = -96
 character.flagInput = false --if input received in this cycle
 character.armor = "steel"
 character.gender = "female"
+character.speed = 40
+character.animationFamerate = character.speed/2
 
 function character:getSpeed()
     return self.speed
@@ -139,25 +139,25 @@ function character:update(dt)
             self.velY = 0
         elseif self.direction == "upright" then
             self.velX = self.speed * 10 * math.sqrt(0.5)
-            self.velY = -self.speed * 10 * math.sqrt(0.5)
+            self.velY = -self.speed * 5 * math.sqrt(0.5)
         elseif self.direction == "up" then
             self.velX = 0
-            self.velY = -self.speed * 10
+            self.velY = -self.speed * 5
         elseif self.direction == "upleft" then
             self.velX = -self.speed * 10 * math.sqrt(0.5)
-            self.velY = -self.speed * 10 * math.sqrt(0.5)
+            self.velY = -self.speed * 5 * math.sqrt(0.5)
         elseif self.direction == "left" then
             self.velX = -self.speed * 10
             self.velY = 0
         elseif self.direction == "downleft" then
             self.velX = -self.speed * 10 * math.sqrt(0.5)
-            self.velY = self.speed * 10 * math.sqrt(0.5)
+            self.velY = self.speed * 5 * math.sqrt(0.5)
         elseif self.direction == "down" then
             self.velX = 0
-            self.velY = self.speed * 10
+            self.velY = self.speed * 5
         elseif self.direction == "downright" then
             self.velX = self.speed * 10 * math.sqrt(0.5)
-            self.velY = self.speed * 10 * math.sqrt(0.5)
+            self.velY = self.speed * 5 * math.sqrt(0.5)
         end
 
         if not self.flagInput and (self.currentFrameNum == 4 or self.currentFrameNum == 8) then
