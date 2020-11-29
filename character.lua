@@ -48,8 +48,10 @@ function character:getArmor()
 end
 
 function character:setArmor(armr)
-    self.armor = armr
-    self.sprites[1] = assetManager.human.image.getBody("female", self.armor)
+    if self.armor ~= armr then
+        self.armor = armr
+        self.sprites[1] = assetManager.human.image.getBody("female", self.armor)
+    end
 end
 
 --TODO put this in its own primitive, controllable
@@ -95,14 +97,15 @@ function character:movementInput(x, y)
 end
 
 function character:getNetworkingData()
-    return self.posX, self.posY, self.state, self.direction
+    return self.posX, self.posY, self.state, self.direction, self.armor
 end
 
-function character:setFromNetworking(x, y, stt, dir)
+function character:setFromNetworking(x, y, stt, dir, armr)
     self.posX = x
     self.posY = y
     self.direction = dir
     self:setState(stt)
+    self:setArmor(armr)
 end
 
 --TODO make it so you don't have to correct this here correct todos in class
