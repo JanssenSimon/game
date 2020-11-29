@@ -169,14 +169,19 @@ cam:draw(function(l,t,w,h)
     --draw map
     map.draw(cam, 10)
 
-    --TODO fix z fighting
+    --draw other characters deeper than local character
+    for id, c in pairs(otherCharacters) do
+        if select(2, c:getPosition()) < select(2, localChar:getPosition()) then
+            c:draw(cam)
+        end
+    end
     --draw local character
     localChar:draw(cam)
-
-    --draw other characters
+    --draw other characters deeper than local character
     for id, c in pairs(otherCharacters) do
-        c:draw(cam)
+        if select(2, c:getPosition()) > select(2, localChar:getPosition()) then
+            c:draw(cam)
+        end
     end
-
 end)
 end
