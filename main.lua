@@ -43,6 +43,14 @@ function love.load()
         if string.find(setting, 'serverIP:') then
             address = string.sub(setting, select(2, string.find(setting, 'serverIP:')) + 2, -1)
             --TODO if address is localhost, start local server
+        elseif string.find(setting, 'left:') then
+            leftKey = string.sub(setting, select(2, string.find(setting, 'left:')) + 2, -1)
+        elseif string.find(setting, 'down:') then
+            downKey = string.sub(setting, select(2, string.find(setting, 'down:')) + 2, -1)
+        elseif string.find(setting, 'up:') then
+            upKey = string.sub(setting, select(2, string.find(setting, 'up:')) + 2, -1)
+        elseif string.find(setting, 'right:') then
+            rightKey = string.sub(setting, select(2, string.find(setting, 'right:')) + 2, -1)
         end
     end
     port = 6969
@@ -90,16 +98,16 @@ function love.update(dt)
     --manage inputs
     mx = 0
     my = 0
-    if love.keyboard.isDown("right") then
+    if love.keyboard.isDown(rightKey) then
         mx = 1
     end
-    if love.keyboard.isDown("left") then
+    if love.keyboard.isDown(leftKey) then
         mx = -1
     end
-    if love.keyboard.isDown("up") then
+    if love.keyboard.isDown(upKey) then
         my = -1
     end
-    if love.keyboard.isDown("down") then
+    if love.keyboard.isDown(downKey) then
         my = 1
     end
     localChar:movementInput(mx, my)
