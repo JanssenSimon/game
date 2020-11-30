@@ -66,8 +66,10 @@ function love.load()
     localCharAnims = {assetManager.human.quads.getIdle(), assetManager.human.quads.getRunning()}
     localChar = class.makeFrom({character})
     localChar:load(400, 200, {localCharBody, localCharHead}, localCharAnims)
+    localChar:setSpeed(40)
+    localChar:setArmor("leather")
     --send the local player's info to server here
-    dg = string.format("%s %f %f %s %s", uniqueID, localChar:getNetworkingData())
+    dg = string.format("%s %f %f %s %s %s", uniqueID, localChar:getNetworkingData())
     udp:send(dg)
 
 
@@ -114,7 +116,7 @@ function love.update(dt)
     t = t + dt
     if t > updaterate then
         --send "uniqueID posX posY state direction"
-        dg = string.format("%s %f %f %s %s", uniqueID, localChar:getNetworkingData())
+        dg = string.format("%s %f %f %s %s %s", uniqueID, localChar:getNetworkingData())
         udp:send(dg)
 
         t = t - updaterate
@@ -126,24 +128,28 @@ function love.update(dt)
         if data then
             --print("Message received!: "..data)
             --parse data from server
+            --TODO make a loop for this
             firstSeperatorIndex = string.find(data, " ")
             secondSeperatorIndex = string.find(data, " ", firstSeperatorIndex+1)
             thirdSeperatorIndex = string.find(data, " ", secondSeperatorIndex+1)
             fourthSeperatorIndex = string.find(data, " ", thirdSeperatorIndex+1)
+            fifthSeperatorIndex = string.find(data, " ", fourthSeperatorIndex+1)
             
             id = string.sub(data, 1, firstSeperatorIndex-1)
             x = tonumber(string.sub(data, firstSeperatorIndex+1, secondSeperatorIndex-1))
             y = tonumber(string.sub(data, secondSeperatorIndex+1, thirdSeperatorIndex-1))
             st8 = string.sub(data, thirdSeperatorIndex+1, fourthSeperatorIndex-1)
-            dir = string.sub(data, fourthSeperatorIndex+1, -1)
+            dir = string.sub(data, fourthSeperatorIndex+1, fifthSeperatorIndex-1)
+            armr = string.sub(data, fifthSeperatorIndex+1, -1)
 
             --init other character if they dont exist
             if not otherCharacters[id] then
                 otherCharacters[id] = class.makeFrom({character})
                 otherCharacters[id]:load(x, y, {otherCharsBody, otherCharsHead}, otherCharsAnims)
+                otherCharacters[id]:setSpeed(40)
             end
             --change values of other character
-            otherCharacters[id]:setFromNetworking(x, y, st8, dir)
+            otherCharacters[id]:setFromNetworking(x, y, st8, dir, armr)
 
         elseif msg ~= 'timeout' then
             --error("Network error: "..tostring(msg))
@@ -163,13 +169,19 @@ cam:draw(function(l,t,w,h)
     --draw map
     map.draw(cam, 10)
 
+    --draw other characters deeper than local character
+    for id, c in pairs(otherCharacters) do
+        if select(2, c:getPosition()) < select(2, localChar:getPosition()) then
+            c:draw(cam)
+        end
+    end
     --draw local character
     localChar:draw(cam)
-
-    --draw other characters
+    --draw other characters deeper than local character
     for id, c in pairs(otherCharacters) do
-        c:draw(cam)
+        if select(2, c:getPosition()) > select(2, localChar:getPosition()) then
+            c:draw(cam)
+        end
     end
-
 end)
 end

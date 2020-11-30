@@ -13,12 +13,22 @@ character = class.makeFrom({worldObject, moveable})
 
 character.state = "idle"
 character.direction = "right"
-character.speed = 300
---TODO make framerate depend on speed
 character.drawOffsetX = -64
 character.drawOffsetY = -96
---if input received in this cycle
-character.flagInput = false
+character.flagInput = false --if input received in this cycle
+character.armor = "steel"
+character.gender = "female"
+character.speed = 40
+character.animationFamerate = character.speed/2
+
+function character:getSpeed()
+    return self.speed
+end
+
+function character:setSpeed(spd)
+    self.speed = spd
+    self.animationFamerate = self.speed/2
+end
 
 function character:setState(stt)
     if self.state ~= stt then
@@ -30,6 +40,29 @@ function character:setState(stt)
             self:setAnimation(2)
             self.currentFrameNum = 1
         end
+    end
+end
+
+function character:getArmor()
+    return self.armor
+end
+
+function character:setArmor(armr)
+    if self.armor ~= armr then
+        self.armor = armr
+        self.sprites[1] = assetManager.human.image.getBody(self.gender, self.armor)
+    end
+end
+
+function character:getGender()
+    return self.gender
+end
+
+function character:setGender(gend)
+    if self.gender ~= gend then
+        self.gender = gend
+        self.sprites[2] = assetManager.human.image.getHead(self.gender)
+        self.sprites[1] = assetManager.human.image.getBody(self.gender, self.armor)
     end
 end
 
@@ -76,18 +109,20 @@ function character:movementInput(x, y)
 end
 
 function character:getNetworkingData()
-    return self.posX, self.posY, self.state, self.direction
+    return self.posX, self.posY, self.state, self.direction, self.armor
 end
 
-function character:setFromNetworking(x, y, stt, dir)
+function character:setFromNetworking(x, y, stt, dir, armr)
     self.posX = x
     self.posY = y
     self.direction = dir
     self:setState(stt)
+    self:setArmor(armr)
 end
 
 --TODO make it so you don't have to correct this here correct todos in class
 function character:update(dt)
+
     --update quads based on animation timings
     self.t = self.t + dt
     if self.t > 1/self.animationFramerate then
@@ -100,29 +135,29 @@ function character:update(dt)
 
     if self.state == "running" then
         if self.direction == "right" then
-            self.velX = self.speed
+            self.velX = self.speed * 10
             self.velY = 0
         elseif self.direction == "upright" then
-            self.velX = self.speed * math.sqrt(0.5)
-            self.velY = -self.speed * math.sqrt(0.5)
+            self.velX = self.speed * 10 * math.sqrt(0.5)
+            self.velY = -self.speed * 5 * math.sqrt(0.5)
         elseif self.direction == "up" then
             self.velX = 0
-            self.velY = -self.speed
+            self.velY = -self.speed * 5
         elseif self.direction == "upleft" then
-            self.velX = -self.speed * math.sqrt(0.5)
-            self.velY = -self.speed * math.sqrt(0.5)
+            self.velX = -self.speed * 10 * math.sqrt(0.5)
+            self.velY = -self.speed * 5 * math.sqrt(0.5)
         elseif self.direction == "left" then
-            self.velX = -self.speed
+            self.velX = -self.speed * 10
             self.velY = 0
         elseif self.direction == "downleft" then
-            self.velX = -self.speed * math.sqrt(0.5)
-            self.velY = self.speed * math.sqrt(0.5)
+            self.velX = -self.speed * 10 * math.sqrt(0.5)
+            self.velY = self.speed * 5 * math.sqrt(0.5)
         elseif self.direction == "down" then
             self.velX = 0
-            self.velY = self.speed
+            self.velY = self.speed * 5
         elseif self.direction == "downright" then
-            self.velX = self.speed * math.sqrt(0.5)
-            self.velY = self.speed * math.sqrt(0.5)
+            self.velX = self.speed * 10 * math.sqrt(0.5)
+            self.velY = self.speed * 5 * math.sqrt(0.5)
         end
 
         if not self.flagInput and (self.currentFrameNum == 4 or self.currentFrameNum == 8) then
