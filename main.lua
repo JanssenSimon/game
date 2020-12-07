@@ -2,6 +2,7 @@
 --main function that runs the game
 
 map = require("map")
+menu = require("menu")
 gamera = require("gamera")
 class = require("tools.class")
 character = require("character")
@@ -68,6 +69,9 @@ function love.load()
     uniqueID = tostring(math.random(99999))
     print("My uniqueID is "..uniqueID)
 
+    --init the menu
+    mainMenu = menu.load()
+
     --init the local player's character
     localCharBody = assetManager.human.image.getBody("female", "steel")
     localCharHead = assetManager.human.image.getHead("female")
@@ -113,6 +117,9 @@ function love.update(dt)
     localChar:movementInput(mx, my)
 
     --computer stuff for updating
+    --update mainMenu
+    menu.update(dt, {})
+
     --update local character
     localChar:update(dt)
     --print(localChar:getNetworkingData())
@@ -172,8 +179,8 @@ function love.update(dt)
 end
 
 function love.draw()
+--draw things that rely on in game camera position
 cam:draw(function(l,t,w,h)
-
     --draw map
     map.draw(cam, 10)
 
@@ -192,4 +199,7 @@ cam:draw(function(l,t,w,h)
         end
     end
 end)
+
+--draw things that don't rely on in game camera (UI)
+menu.draw()
 end
